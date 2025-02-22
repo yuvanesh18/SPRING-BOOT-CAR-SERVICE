@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>	PRIME AUTOMOBILES PRIVATE LIMITED</title>
+<link rel="stylesheet" th:href="@{/vehicle.css}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+</head>
+<body>
+ <div class="container">
+<a href="/admin/admindashboard"  class="back-btn">Back to Admin DashBoard</a>
+<h1 th:if="${vehiclelist.size()==0}">YOUR TECHNICIANS ARE NOT GOOD AT WORKING........</h1>
+<table class="vehicle-table" th:if="${vehiclelist.size()>0}">
+    <thead>
+        <tr>
+        	<th>CUSTOMER NAME </th>
+            <th>CUSTOMER CONTACT</th>
+            <th>MODEL </th>
+            <th>REGISTERATION NUMBER </th>
+            <th>WARRANTY</th>
+            <th>ENTRY DATE</th>
+            <th>RELEASED DATE</th>
+            <th>TECHNICIAN</th>
+            <th>COST</th>
+            <th>BILL</th>
+        </tr>
+    </thead>
+    <tbody>
+	
+	<th:block th:each="vlist, rowStat : ${vehiclelist}" >
+        <tr th:onclick="toggleRow([[${rowStat.index}]])" style="cursor: pointer;">
+        
+         	<td><span th:text="${vlist.customerName}"></span></td>
+         	<td><span th:text="${vlist.customerContact}"></span></td>
+         	
+            <td><span th:text="${vlist.model}"> </span></td>
+            <td><span th:text="${vlist.registrationNumber}">  </span></td>
+            <td><span th:text="${vlist.warranty}"> </span></td>
+            
+            <td><span th:text="${vlist.entryDate}"> </span></td>
+            <td><span th:text="${vlist.ReleasedDate}"> </span></td>
+         
+            <td><span th:text="${vlist.employee}"> </span></td>
+                       
+            <td><span th:text="${vlist.actual_cost}"> </span></td>
+            
+            <td><a  th:href="@{/vehicle/printbom(id=${vlist.id})}" >PRINT</a></td>
+            
+        </tr>
+               <!-- Hidden Row -->
+      	<tr th:id="'issueRow' + ${rowStat.index}" class="hidden-row">
+      		<td colspan="13">
+      			<strong>ISSUE DESCRIPTION</strong>
+      			<span th:text="${vlist.issuedescription}"></span>
+      		</td>
+      	</tr>
+      </th:block>
+        
+    </tbody>
+</table>
+
+</div>
+
+<script>
+	function toggleRow(index){
+		
+		var row=document.getElementById('issueRow'+index);
+		if(row.style.display === 'none' ){
+			row.style.display = 'table-row';
+		}
+		else{
+			row.style.display = 'none';
+		}
+		
+	}
+	
+</script>
+</body>
+</html>

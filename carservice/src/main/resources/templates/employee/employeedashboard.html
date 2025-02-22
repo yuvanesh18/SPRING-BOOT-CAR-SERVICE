@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Technician Dashboard</title>
+<style>
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: 'Segoe UI', sans-serif;
+}
+
+body {
+	background-color: #f5f6fa;
+	padding: 20px;
+}
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+}
+
+.navbar {
+	background: #fff;
+	padding: 1rem;
+	border-radius: 10px;
+	box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+	margin-bottom: 2rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.card {
+	background: white;
+	border-radius: 10px;
+	padding: 1.5rem;
+	margin-bottom: 2rem;
+	box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card h2 {
+	color: #2c3e50;
+	margin-bottom: 1.5rem;
+	border-bottom: 2px solid #3498db;
+	padding-bottom: 0.5rem;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	margin: 1rem 0;
+}
+
+th, td {
+	padding: 12px;
+	text-align: left;
+	border-bottom: 1px solid #ddd;
+}
+
+th {
+	background-color: #3498db;
+	color: white;
+}
+
+tr:hover {
+	background-color: #f5f6fa;
+}
+
+.status-indicator {
+	padding: 4px 8px;
+	border-radius: 4px;
+	font-size: 0.9em;
+}
+
+.status-in-service {
+	background-color: #f39c12;
+	color: white;
+}
+
+.status-completed {
+	background-color: #2ecc71;
+	color: white;
+}
+
+.material-form {
+	display: grid;
+	gap: 1rem;
+	grid-template-columns: 1fr 1fr;
+}
+
+.selected-materials {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0.5rem 0;
+}
+
+.material-tag {
+	background: #3498db;
+	color: white;
+	padding: 4px 8px;
+	border-radius: 15px;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.material-tag-remove {
+	cursor: pointer;
+	font-size: 0.8em;
+}
+
+input, select {
+	padding: 8px;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	width: 100%;
+}
+
+button {
+	background: #3498db;
+	color: white;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.3s;
+}
+
+button:hover {
+	background: #2980b9;
+}
+
+.toggle-row {
+	background: #f8f9fa;
+	transition: all 0.3s;
+}
+
+.toggle-row:hover {
+	background: #e9ecef;
+}
+
+.issue-description {
+	padding: 1rem;
+	background: #f8f9fa;
+	border-radius: 4px;
+	margin-top: 0.5rem;
+}
+
+.expand-icon {
+	transition: transform 0.3s;
+}
+
+.expanded .expand-icon {
+	transform: rotate(180deg);
+}
+
+@media ( max-width : 768px) {
+	.material-form {
+		grid-template-columns: 1fr;
+	}
+}
+</style>
+<!-- Keep your existing JavaScript here -->
+ <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll(".materialDropdown").forEach((dropdown,index)=>{
+            const selectedMaterialsContainer = document.getElementById("selectedMaterialsContainer-"+index);
+            const selectedMaterialsInput = document.getElementById("selectedMaterials-"+index);
+
+            let selectedMaterials = [];
+
+            dropdown.addEventListener("change", function () {
+                let selectedValue = dropdown.value;
+
+                if (selectedValue && !selectedMaterials.includes(selectedValue)) {
+                    selectedMaterials.push(selectedValue);
+                    updateSelectedMaterialsUI();
+                }
+                dropdown.selectedIndex = 0;
+            });
+
+                
+            function updateSelectedMaterialsUI() {
+                selectedMaterialsContainer.innerHTML = ""; // Clear previous content
+
+                selectedMaterials.forEach((material, index) => {
+                    let tag = document.createElement("span");
+                    tag.textContent = material + " ";
+                    tag.style.padding = "5px 10px";
+                    tag.style.margin = "5px";
+                    tag.style.backgroundColor = "#ddd";
+                    tag.style.borderRadius = "5px";
+                    tag.style.cursor = "pointer";
+
+                    let removeBtn = document.createElement("span");
+                    removeBtn.textContent = "✖";
+                    removeBtn.style.marginLeft = "5px";
+                    removeBtn.style.color = "red";
+                    removeBtn.style.cursor = "pointer";
+
+                    removeBtn.addEventListener("click", function () {
+                        selectedMaterials.splice(index, 1);
+                        updateSelectedMaterialsUI();
+                    });
+
+                    tag.appendChild(removeBtn);
+                    selectedMaterialsContainer.appendChild(tag);
+                });
+                selectedMaterialsInput.value = selectedMaterials.join(",");
+            }
+            });
+            
+            
+        });
+        
+        
+        function toggleRow(index){
+    		
+    		var row=document.getElementById('issueRow'+index);
+    		if(row.style.display === 'none' ){
+    			row.style.display = 'table-row';
+    		}
+    		else{
+    			row.style.display = 'none';
+    		}
+    		
+    	}
+</script>
+</head>
+<body>
+	<div class="container">
+		<nav class="navbar">
+			<div>
+				<h2>
+					Welcome, <span th:text="${name}"></span>
+				</h2>
+				<a th:href="@{/admin/passwordresetform}"
+					style="text-decoration: none; color: #3498db;">Reset Password</a>
+			</div>
+			<form th:action="@{/logout}" method="post">
+				<button type="submit">Logout</button>
+			</form>
+		</nav>
+
+		<div class="card">
+			<h2>Check Vehicle History</h2>
+			<form th:action="@{/employee/checkhistory}">
+				<div style="display: flex; gap: 1rem;">
+					<input type="text" name="registrationNumber"
+						placeholder="Enter Vehicle Registration Number" style="flex: 1;">
+					<button type="submit">Search</button>
+				</div>
+			</form>
+		</div>
+
+		<div class="card">
+			<h2>Service History</h2>
+			<div style="overflow-x: auto;">
+				<table>
+					<thead>
+						<tr>
+							<th>Vehicle ID</th>
+							<th>Model</th>
+							<th>Reg Number</th>
+							<th>Warranty</th>
+							<th>Status</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						<th:block th:each="sh, iterStat : ${servicehistory}">
+							<tr th:onclick="toggleRow([[${iterStat.index}]])"
+								class="toggle-row"
+								th:classappend="${iterStat.index % 2} == 0 ? 'even' : 'odd'">
+								<td th:text="${sh.id}"></td>
+								<td th:text="${sh.model}"></td>
+								<td th:text="${sh.registrationNumber}"></td>
+								<td th:text="${sh.warranty}"></td>
+								<td><span
+									th:classappend="${sh.status == 'UNDER SERVICING'} ? 'status-indicator status-in-service' 
+                                          : 'status-indicator status-completed'"
+									th:text="${sh.status}"></span></td>
+								<td>
+									<form th:action="@{/admin/generatebill}" method="post">
+
+										<input type="hidden" name="vehicleid" th:value="${sh.id}" />
+										<input type="hidden" name="employeeid"
+											th:value="${employee.id}">
+
+										<div th:id="'selectedMaterialsContainer-' + ${iterStat.index}"></div>
+										<div th:id="'selectedQuantityContainer-' + ${iterStat.index}"></div>
+
+										<input type="hidden"
+											th:id="'selectedMaterials-' + ${iterStat.index}"
+											name="selectedMaterials"> <input type="text"
+											name="quantities"
+											placeholder="Enter Quantities using comma separated">
+
+										<label for="materials">Select Materials:</label> <select
+											th:id="'materialDropdown-' + ${iterStat.index}"
+											class="materialDropdown">
+											<option value="" disabled selected>Select a material</option>
+											<option th:each="material : ${materials}"
+												th:value="${material.item}" th:text="${material.item}"></option>
+										</select>
+
+										<button
+											th:if="${sh.status!='SERVICED' && sh.status!='COMPLETED'}"
+											type="submit">Enter Materials Bill</button>
+									</form>
+								</td>
+							</tr>
+							<tr th:id="'issueRow' + ${iterStat.index}" style="display: none;">
+								<td colspan="6">
+									<div class="issue-description">
+										<strong>Issue Description:</strong>
+										<p th:text="${sh.issuedescription}"></p>
+									</div>
+								</td>
+							</tr>
+						</th:block>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+		<!-- Add similar card structure for Vehicle History -->
+		<div class="card">
+			<h2>Vehicle History</h2>
+			<div style="overflow-x: auto;">
+				<table border="1">
+					<thead>
+						<tr>
+							<th>Vehicle Model</th>
+							<th>Vehicle Registration Number</th>
+							<th>Vehicle Warranty</th>
+							<th>Vehicle IssueDiscription</th>
+
+							<th>Vehicle Released Date</th>
+							<th>Previous service advisor</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="vh : ${vehiclehistory}">
+							<td th:text="${vh.model}"></td>
+							<td th:text="${vh.registrationNumber}"></td>
+							<td th:text="${vh.warranty}"></td>
+							<td th:text="${vh.issuedescription}"></td>
+
+							<td th:text="${vh.ReleasedDate}"></td>
+							<td th:text="${vh.employee}"></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

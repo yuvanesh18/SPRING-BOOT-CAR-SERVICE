@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice - Prime Automobiles</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 2cm;
+            color: #333;
+        }
+
+        @media print {
+            body {
+                margin: 1cm;
+            }
+            .noprint {
+                display: none !important;
+            }
+        }
+
+		
+		
+        .invoice-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .company-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+        }
+        
+        .details-section{
+			display:flex;
+			justify-content: space-between;
+			margin-bottom: 30px;
+		}
+		
+		.invoice-info{
+			font-size: 14px;
+		}
+
+        .total-row td {
+            font-weight: 700;
+            background-color: #f8f9fa;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .payment-details {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        
+
+        .print-button {
+            background-color: #2c3e50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 30px;
+            transition:background-color 0.3s;
+        }
+        
+        .print-button:hover{
+        	background-colot:#2980b9;
+        }
+        
+        
+        .watermark{
+        	position: fixed;
+        	opacity:0.1;
+        	font-size: 120px;
+        	transform: rotate(-45deg);
+        	top:40%;
+        	left:20%;
+        	pointer-events:none;
+        	display:none;
+        }
+        
+        @media print{
+        	.watermark{
+        		display:block;
+        	}
+        }
+    </style>
+</head>
+<body>
+    <div class="invoice-container">
+        <div class="header-section">
+            <div class="company-name">PRIME AUTOMOBILES PRIVATE LIMITED</div>
+            <div style="font-size: 14px; color: #666; margin-top: 10px;">
+                123 Automotive Avenue, Motor City<br>
+                Chennai - 600001, Tamil Nadu
+            </div>
+            <h2 style="margin: 20px 0; color: #444;">PAYMENT INVOICE</h2>
+        </div>
+		 <div class="details-section">
+            <div class="invoice-info">
+                <strong>Invoice Number:</strong> #INV-<span th:text="${vehicle.id}"></span><br>
+                <strong>Invoice Date:</strong> <span th:text="${vehicle.paymentDate}"></span>
+            </div>
+            <div class="invoice-info">
+                <strong>Customer Name:</strong><span th:text="${vehicle.customerName}"></span><br>
+                <strong>Vehicle Reg No:</strong> <span th:text="${vehicle.registrationNumber}"></span>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Items</th>
+                    <th class="align-right">Quantity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="l:${list1}">
+                    <td th:text="${l[0]}"></td>
+                    <td class="align-right" th:text="${l[1]}"></td>
+                </tr>
+                <tr class="total-row">
+                    <td>Total</td>
+                    <td class="align-right" th:text="${cost}"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="payment-details">
+            <div style="margin-bottom: 8px;">
+                <strong>Payment Mode:</strong> 
+                <span th:text="${vehicle.paymentType}"></span>
+            </div>
+            <div style="margin-bottom: 8px;">
+                <strong>Reference Number:</strong> 
+                <span th:text="${vehicle.referenceNumber}"></span>
+            </div>
+            <div>
+                <strong>Payment Date:</strong> 
+                <span th:text="${vehicle.paymentDate}"></span>
+            </div>
+        </div>
+ <div class="footer-section" style="margin-top: 40px; text-align: center; color: #7f8c8d; font-size: 14px;">
+            <p>Thank you for your business!</p>
+            <p>This is a computer-generated invoice and does not require a physical signature</p>
+        </div>
+
+        <div class="watermark">PAID</div>
+        <center>
+            <button class="noprint print-button" onclick="window.print()">Print Invoice</button>
+        </center>
+    </div>
+</body>
+</html>

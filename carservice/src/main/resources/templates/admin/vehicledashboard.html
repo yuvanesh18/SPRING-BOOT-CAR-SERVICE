@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vehicle List Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/vehicle.css}">
+    <script type="text/javascript">
+        function disableBack() {
+            window.history.forward();
+        }
+        setTimeout("disableBack()", 0);
+        window.onunload = function () { null };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>VEHICLE LIST</h1>
+        <a href="/admin/admindashboard" class="back-btn">Back to Admin DashBoard</a>
+
+        <!-- Filter Form -->
+        <form th:action="@{/admin/filtervehicle}" class="filter-form">
+            <label for="status">Filter By Status:</label>
+            <select name="status" id="status">
+                <option value="">ALL</option>
+                <option value="DUE">DUE</option>
+                <option value="UNDER SERVICING">UNDER SERVICING</option>
+                <option value="SERVICED">SERVICED</option>
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+
+        <!-- Vehicle Table -->
+        <table class="vehicle-table">
+            <thead>
+                <tr>
+                    <th>CUSTOMER NAME</th>
+                    <th>CUSTOMER CONTACT</th>
+                    <th>MODEL</th>
+                    <th>REGISTRATION NUMBER</th>
+                    <th>STATUS</th>
+                    <th>WARRANTY</th>
+                    <th>ENTRY DATE</th>
+                    <th>RELEASED DATE</th>
+                    <th>ASSIGN</th>
+                    <th>COST</th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:each="vlist, rowStat : ${vehiclelist}">
+                    <tr th:onclick="toggleRow([[${rowStat.index}]])" style="cursor: pointer;">
+                        <td><span th:text="${vlist.customerName}"></span></td>
+                        <td><span th:text="${vlist.customerContact}"></span></td>
+                        <td><span th:text="${vlist.model}"></span></td>
+                        <td><span th:text="${vlist.registrationNumber}"></span></td>
+                        <td><span th:text="${vlist.status}"></span></td>
+                        <td><span th:text="${vlist.warranty}"></span></td>
+                        <td><span th:text="${vlist.entryDate}"></span></td>
+                        <td><span th:text="${vlist.ReleasedDate}"></span></td>
+                        <td>
+                            <form th:if="${vlist.status=='DUE' && employeeCount>0}" th:action="@{/vehicle/assignvehicle}">
+                                <input type="hidden" name="vehicleId" th:value="${vlist.id}">
+                                <select name="employeeId">
+                                    <option value="" selected disabled>SELECT ADVISOR</option>
+                                    <option th:each="employee :${employeeList}" th:value="${employee.id}" th:text="${employee.name}"></option>
+                                </select>
+                                <button type="submit">ASSIGN</button>
+                            </form>
+                            <span th:if="${vlist.status!='DUE'}">ASSIGNED</span>
+                        </td>
+                        <td><span th:text="${vlist.actual_cost}"></span></td>
+                    </tr>
+
+                    <!-- Hidden Row -->
+                    <tr th:id="'issueRow' + ${rowStat.index}" class="hidden-row">
+                        <td colspan="5">
+                            <strong>ISSUE DESCRIPTION</strong>
+                            <span th:text="${vlist.issuedescription}"></span>
+                        </td>
+                        <td colspan="5">
+                            <strong>TECHNICIAN</strong>
+                            <span th:text="${vlist.employee}"></span>
+                        </td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function toggleRow(index) {
+            var row = document.getElementById('issueRow' + index);
+            if (row.style.display === 'none') {
+                row.style.display = 'table-row';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

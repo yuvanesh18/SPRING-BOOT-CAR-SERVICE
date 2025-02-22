@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+        function disableBack() {
+        	window.history.forward();
+         }
+        setTimeout("disableBack()", 0);
+        window.onunload = function () { null };
+</script>
+
+ <link rel="stylesheet" th:href="@{/dashboard.css}">
+   <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css}">
+</head>
+<body>
+
+  <div class="dashboard-container">
+        <!-- Sidebar -->
+        <nav class="sidebar">
+            <div class="logo">Car Service Admin</div>
+            <ul class="menu">
+              	<li>
+                	<a th:href="@{/admin/vehiclelist}">VEHICLE MANAGEMENT</a>
+                </li>
+                <li>
+                	<a  th:href="@{/admin/employeelist}">SERVICE ADVISOR </a>
+                </li>
+                <li>
+                	<a  th:href="@{/admin/serviceHistory}">COMPLETED SERVICE </a>
+				</li>
+                <li>
+                	<form th:action="@{/logout}" method="post">
+						<button  type="submit">LOGOUT</button>
+					</form>
+                </li>
+            </ul>
+        </nav>
+
+	
+	
+	<div class="main-content">
+		<header>
+			<h1>ADMIN DASH BOARD</h1>
+		</header>
+		
+		
+		<section class="cards">
+			<div class="card">
+				
+					<h5>COMPLETED SERVICE</h5>
+					<span th:text="${completedCount}"></span>
+				
+			</div>
+			<div class="card">
+				
+					<h5>SERVICE ADVISOR</h5>
+					<span th:text="${employeeCount}"></span>
+				
+			</div>
+			<div class="card">
+				
+					<h5>PENDING APPROVALS</h5>
+					<span th:text="${approvalpendingCount}"></span>
+				
+			</div>
+			<div class="card">
+				
+					<h5>TOTAL COUNT</h5>
+					<span th:text="${totalcount}"></span>
+			
+			</div>
+		</section>
+		
+		<section class="cards">
+			<div class="card">
+				<a href="/vehicle/vehicleEntry">Add New Vehicle</a>
+			</div>
+			<div class="card">
+				<a href="/employee/addemployeeform">Add New Service Advisor</a>
+			</div>
+			<div class="card">
+				<a href="/admin/materialsList">ADD MATERIALS & PRICE</a>
+			</div>
+		</section>
+		
+		
+		
+		<section class="data-tables">
+	    	<h3>VEHICLE MANAGEMENT</h3>
+		
+			<table class="table">
+				<thead>
+					<tr>
+						<th>STATUS</th>
+						<th>COUNT</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="status : ${statuscount}">
+						<td th:text="${status.key}"></td>
+						<td th:text="${status.value}"></td>
+					</tr>
+				</tbody>
+			</table>
+		
+		
+			<h3>SERVICE ADVISOR MANAGEMENT</h3>
+		
+			<table class="table">
+				<thead>
+					<tr>
+						<th>AVAILABILITY</th>
+						<th>COUNT</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="availablity : ${availablitycount}">
+						<td th:text="${availablity.key}"></td>
+						<td th:text="${availablity.value}"></td>
+					</tr>
+				</tbody>
+			</table>
+			
+			
+			
+			<div th:if="${pendingapprovals.size()>0}">
+				<h3>APPROVAL STATUS</h3>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Vehicle</th>
+							<th>Service Advisor</th>
+							<th>BOM</th>
+							<th>Estimated Cost</th>
+							<th>Actual Cost</th>
+							
+							<th>Payment Status</th>
+							<th>Payment</th>
+							<th >Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr th:each="record : ${pendingapprovals}">
+							<td th:text="${record.registrationNumber}"></td>
+							<td th:text="${record.employee.name}"></td>
+							<td th:text="${record.billOfMaterials}"></td>
+							<td th:text="${record.estimated_cost}"></td>
+							<td th:text="${record.actual_cost}"></td>
+							
+							<td th:text="${record.paymentStatus}"></td>
+							
+							<td>
+								<span th:if="${record.paymentStatus!='Paid'}">
+								<a th:href="@{/admin/paymentpage(id=${record.id})}">PAYMENT PAGE</a>
+								</span>
+								<span th:if="${record.paymentStatus=='Paid'}">PAYMENT PAGE </span>
+							</td>
+							
+							<td>
+								<form th:if="${record.paymentStatus=='Paid'}" th:action="@{/admin/approvebom}" method="post">
+									<input type="hidden" name="recordid" th:value="${record.id}">
+									<button type="submit">Approve</button>
+								</form>
+								<span th:if="${record.paymentStatus!='Paid'}">Approve</span>
+							</td>
+						</tr>
+					</tbody>
+					</table>
+			</div>
+	
+		</section>
+		
+		
+		
+		
+		
+		
+		
+	</div>
+</div>
+</body>
+</html>
